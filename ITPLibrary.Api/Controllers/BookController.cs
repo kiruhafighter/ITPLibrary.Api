@@ -1,7 +1,8 @@
 ﻿using ITPLibrary.Api.Data.Data;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Models;
+using ITPLibrary.Api.Models;
+using ITPLibrary.Api.Data.Repository.IRepository;
 
 namespace ITPLibrary.Api.Controllers
 {
@@ -9,17 +10,19 @@ namespace ITPLibrary.Api.Controllers
     [ApiController]
     public class BookController : ControllerBase
     {
-        private readonly ApplicationDbContext _db;
-        public BookController(ApplicationDbContext db)
+        private readonly IUnitOfWork _unitOfWork;
+        public BookController(IUnitOfWork unitOfWork)
         {
-            _db = db;
+            _unitOfWork = unitOfWork;
         }
 
         [HttpGet(Name = "GetPopularBooks")]
         public IEnumerable<Book> Get()
         {
-            var popularBooks = _db.Books.Where(n => n.PopularityRate > 7).ToList();
+            var popularBooks = _unitOfWork.Book.GetAllWithCondition(n => n.PopularityRate > 9).ToList();
             return popularBooks;
         }
+
+
     }
 }
