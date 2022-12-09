@@ -92,5 +92,20 @@ namespace ITPLibrary.Api.Controllers
             return Ok($"{bookFromDb.Title} deleted succesfully");
         }
 
+        [HttpPut("{id}")]
+        public IActionResult Update(int id, Book book)
+        {
+            if (id != book.Id)
+            {
+                return BadRequest();
+            }
+            _unitOfWork.Book.Update(book);
+            _unitOfWork.Save();
+            return Ok("Book information updated succesfully");
+        }
+
+
+
+
     }
 }
