@@ -92,19 +92,42 @@ namespace ITPLibrary.Api.Controllers
             return Ok($"{bookFromDb.Title} deleted succesfully");
         }
 
+        //[HttpPut("{id}")]
+        //public IActionResult Update(int id, Book book)
+        //{
+        //    if (id != book.Id)
+        //    {
+        //        return BadRequest();
+        //    }
+        //    _unitOfWork.Book.Update(book);
+        //    _unitOfWork.Save();
+        //    return Ok("Book information updated succesfully");
+        //}
+
+
         [HttpPut("{id}")]
-        public IActionResult Update(int id, Book book)
+        public IActionResult Update (int id , string title , double price , string author , double popularRate)
         {
-            if (id != book.Id)
+            if(id == null)
             {
-                return BadRequest();
+                return BadRequest("Id value cannot be null");
             }
-            _unitOfWork.Book.Update(book);
+            var bookToUpdate = _unitOfWork.Book.GetFirstOrDefault(b=>b.Id == id);
+            if(bookToUpdate == null)
+            {
+                return BadRequest("There is no book with a such id");
+            }
+            bookToUpdate.Title = title;
+            bookToUpdate.Price = price;
+            bookToUpdate.Author = author;
+            bookToUpdate.Thumbnail = " ";
+            bookToUpdate.PopularityRate= popularRate;
+            bookToUpdate.AddingTime = DateTime.Now;
+            bookToUpdate.RecentlyAdded = false;
+            _unitOfWork.Book.Update(bookToUpdate);
             _unitOfWork.Save();
-            return Ok("Book information updated succesfully");
+            return Ok("Book updated succesfully");
         }
-
-
 
 
     }
