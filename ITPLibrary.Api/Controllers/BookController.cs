@@ -122,8 +122,14 @@ namespace ITPLibrary.Api.Controllers
             bookToUpdate.Author = author;
             bookToUpdate.Thumbnail = " ";
             bookToUpdate.PopularityRate= popularRate;
-            bookToUpdate.AddingTime = DateTime.Now;
-            bookToUpdate.RecentlyAdded = false;
+            if(bookToUpdate.AddingTime < DateTime.Now.AddDays(-14))
+            {
+                bookToUpdate.RecentlyAdded = true;
+            }
+            else
+            {
+                bookToUpdate.RecentlyAdded = false;
+            }
             _unitOfWork.Book.Update(bookToUpdate);
             _unitOfWork.Save();
             return Ok("Book updated succesfully");
