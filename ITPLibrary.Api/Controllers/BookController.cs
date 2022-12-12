@@ -96,6 +96,7 @@ namespace ITPLibrary.Api.Controllers
         //[HttpPut("{id}")]
         //public IActionResult Update(int id, Book book)
         //{
+        //    book.Id = id;
         //    if (id != book.Id)
         //    {
         //        return BadRequest();
