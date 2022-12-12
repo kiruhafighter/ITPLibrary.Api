@@ -63,12 +63,12 @@ namespace ITPLibrary.Api.Controllers
         {
             if(id==null || id==0)
             {
-                return BadRequest("These is no book with a such 'id'");
+                return BadRequest("Id value cannot be null");
             }
             var bookFromDb = _unitOfWork.Book.GetFirstOrDefault(b => b.Id == id);
             if(bookFromDb == null)
             {
-                return NotFound();
+                return BadRequest("There is no book with a such id");
             }
             _unitOfWork.Book.Remove(bookFromDb);
             _unitOfWork.Save();
@@ -80,18 +80,19 @@ namespace ITPLibrary.Api.Controllers
         {
             if (name == null || name == "")
             {
-                return BadRequest("These is no book with a such 'name'");
+                return BadRequest("'name' cannot be null");
             }
             var bookFromDb = _unitOfWork.Book.GetFirstOrDefault(b => b.Title == name);
             if (bookFromDb == null)
             {
-                return NotFound();
+                return BadRequest("There is no book with a such name");
             }
             _unitOfWork.Book.Remove(bookFromDb);
             _unitOfWork.Save();
             return Ok($"{bookFromDb.Title} deleted succesfully");
         }
 
+        //Old Put Method version
         //[HttpPut("{id}")]
         //public IActionResult Update(int id, Book book)
         //{
@@ -106,14 +107,14 @@ namespace ITPLibrary.Api.Controllers
 
 
         [HttpPut("{id}")]
-        public IActionResult Update (int id , string title , double price , string author , double popularRate)
+        public IActionResult Update(int id, string title, double price, string author, double popularRate)
         {
-            if(id == null)
+            if (id == null)
             {
                 return BadRequest("Id value cannot be null");
             }
-            var bookToUpdate = _unitOfWork.Book.GetFirstOrDefault(b=>b.Id == id);
-            if(bookToUpdate == null)
+            var bookToUpdate = _unitOfWork.Book.GetFirstOrDefault(b => b.Id == id);
+            if (bookToUpdate == null)
             {
                 return BadRequest("There is no book with a such id");
             }
@@ -121,8 +122,8 @@ namespace ITPLibrary.Api.Controllers
             bookToUpdate.Price = price;
             bookToUpdate.Author = author;
             bookToUpdate.Thumbnail = " ";
-            bookToUpdate.PopularityRate= popularRate;
-            if(bookToUpdate.AddingTime < DateTime.Now.AddDays(-14))
+            bookToUpdate.PopularityRate = popularRate;
+            if (bookToUpdate.AddingTime < DateTime.Now.AddDays(-14))
             {
                 bookToUpdate.RecentlyAdded = true;
             }
