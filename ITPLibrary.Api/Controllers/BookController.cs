@@ -32,10 +32,25 @@ namespace ITPLibrary.Api.Controllers
             return allBooks;
         }
 
-        [HttpGet("name")]
+        [HttpGet("{name}")]
         public IActionResult GetByName(string name)
         {
-            var bookById = _unitOfWork.Book.GetFirstOrDefault(b=>b.Title== name);
+            var bookByName = _unitOfWork.Book.GetFirstOrDefault(b => b.Title == name);
+            if (bookByName == null)
+            {
+                return NotFound();
+            }
+            return Ok(bookByName);
+        }
+
+        [HttpGet("id")]
+        public IActionResult GetById(int id)
+        {
+            if (id == 0 || id == null)
+            {
+                return BadRequest("Id cannot be null");
+            }
+            var bookById = _unitOfWork.Book.GetFirstOrDefault(b => b.Id == id);
             if(bookById == null)
             {
                 return NotFound();
