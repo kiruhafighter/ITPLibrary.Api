@@ -25,7 +25,5 @@ namespace ITPLibrary.Api.Models
         public double PopularityRate { get; set; }
         public DateTime? AddingTime { get; set; } = DateTime.Now;
         public bool RecentlyAdded { get; set; } = false;
-
-
     }
 }

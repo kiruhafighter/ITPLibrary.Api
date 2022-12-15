@@ -2,7 +2,8 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using ITPLibrary.Api.Models;
-using ITPLibrary.Api.Data.Repository.IRepository;
+using ITPLibrary.Api.Core.Services.IServices;
+using ITPLibrary.Api.Core.Dtos;
 
 namespace ITPLibrary.Api.Controllers
 {
@@ -10,146 +11,121 @@ namespace ITPLibrary.Api.Controllers
     [ApiController]
     public class BookController : ControllerBase
     {
-        private readonly IUnitOfWork _unitOfWork;
-        public BookController(IUnitOfWork unitOfWork)
+        private readonly IBookService _boorService;
+        public BookController(IBookService boorService)
         {
-            _unitOfWork = unitOfWork;
+            _boorService = boorService;
         }
 
         [HttpGet]
         [Route("getpopularbooks")]
-        public IEnumerable<Book> GetPopularBooks()
+        public IEnumerable<BookDto> GetPopularBooks()
         {
-            var popularBooks = _unitOfWork.Book.GetAllWithCondition(n => n.PopularityRate > 9).ToList();
-            return popularBooks;
+            return _boorService.GetPopularBooks();
         }
 
         [HttpGet]
         [Route("getallbooks")]
-        public IEnumerable<Book> GetAllBooks()
+        public IEnumerable<BookDto> GetAllBooks()
         {
-            var allBooks = _unitOfWork.Book.GetAll().ToList();
-            return allBooks;
+            return _boorService.GetAllBooks();
         }
 
-        [HttpGet("{name}")]
+        [HttpGet("name")]
         public IActionResult GetByName(string name)
         {
-            var bookByName = _unitOfWork.Book.GetFirstOrDefault(b => b.Title == name);
-            if (bookByName == null)
+            if (name == null || name.Length == 0)
+            {
+                return BadRequest();
+            }
+            if(_boorService.GetByName(name) == null)
             {
                 return NotFound();
             }
-            return Ok(bookByName);
+            return Ok(_boorService.GetByName(name));
         }
 
         [HttpGet("id")]
         public IActionResult GetById(int id)
         {
-            if (id == 0 || id == null)
+            if (id == null || id == 0)
             {
-                return BadRequest("Id cannot be null");
+                return BadRequest();
             }
-            var bookById = _unitOfWork.Book.GetFirstOrDefault(b => b.Id == id);
-            if(bookById == null)
+            if (_boorService.GetById(id) == null)
             {
                 return NotFound();
             }
-            return Ok(bookById);
+            return Ok(_boorService.GetById(id));
         }
 
         [HttpPost("book")]
         public IActionResult Post(Book book)
         {
-            if (book != null && book.Id == 0)
+            var bookToPost = _boorService.Post(book);
+            if (bookToPost == null)
             {
-                _unitOfWork.Book.Add(book);
-                _unitOfWork.Save();
-                return Ok(book);
+                return BadRequest();
             }
-            else
-            {
-                return BadRequest("Wrong values. Remember : Values except 'id' cannot be null. You cannot assign a value to the 'id' field");
-            }
+            return Ok(bookToPost);
         }
 
         [HttpDelete("id")]
         public IActionResult Delete(int id)
         {
-            if(id==null || id==0)
+            if (id == null || id == 0)
             {
-                return BadRequest("Id value cannot be null");
+                return BadRequest();
             }
-            var bookFromDb = _unitOfWork.Book.GetFirstOrDefault(b => b.Id == id);
-            if(bookFromDb == null)
+            var bookToDelete = _boorService.Delete(id);
+            if (bookToDelete == null)
             {
-                return BadRequest("There is no book with a such id");
+                return NotFound();
             }
-            _unitOfWork.Book.Remove(bookFromDb);
-            _unitOfWork.Save();
-            return Ok($"{bookFromDb.Title} deleted succesfully");
+            return Ok(bookToDelete);
         }
 
         [HttpDelete("name")]
         public IActionResult Delete(string name)
         {
-            if (name == null || name == "")
-            {
-                return BadRequest("'name' cannot be null");
+            if (name == null || name.Length == 0)
+            { 
+                return BadRequest();
             }
-            var bookFromDb = _unitOfWork.Book.GetFirstOrDefault(b => b.Title == name);
-            if (bookFromDb == null)
+            var bookToDelete = _boorService.Delete(name);
+            if (bookToDelete == null)
             {
-                return BadRequest("There is no book with a such name");
+                return NotFound();
             }
-            _unitOfWork.Book.Remove(bookFromDb);
-            _unitOfWork.Save();
-            return Ok($"{bookFromDb.Title} deleted succesfully");
+            return Ok(bookToDelete);
         }
 
         //Old Put Method version
         //[HttpPut("{id}")]
         //public IActionResult Update(int id, Book book)
         //{
-        //    book.Id = id;
-        //    if (id != book.Id)
-        //    {
+        //    if (book.Id == id || !ModelState.IsValid)
+        //    { 
         //        return BadRequest();
         //    }
-        //    _unitOfWork.Book.Update(book);
-        //    _unitOfWork.Save();
-        //    return Ok("Book information updated succesfully");
+        //    var bookFromDb = _boorService.GetById(id);
+        //    if(bookFromDb == null)
+        //    {
+        //        return NotFound();
+        //    }
+        //    return Ok(_boorService.Update(id, book));
         //}
 
 
         [HttpPut("{id}")]
         public IActionResult Update(int id, string title, double price, string author, double popularRate)
         {
-            if (id == null)
+            var bookToUpdate = _boorService.Update(id, title, price, author, popularRate);
+            if(bookToUpdate == null)
             {
-                return BadRequest("Id value cannot be null");
+                return NotFound();
             }
-            var bookToUpdate = _unitOfWork.Book.GetFirstOrDefault(b => b.Id == id);
-            if (bookToUpdate == null)
-            {
-                return BadRequest("There is no book with a such id");
-            }
-            bookToUpdate.Title = title;
-            bookToUpdate.Price = price;
-            bookToUpdate.Author = author;
-            bookToUpdate.Thumbnail = " ";
-            bookToUpdate.PopularityRate = popularRate;
-            if (bookToUpdate.AddingTime < DateTime.Now.AddDays(-14))
-            {
-                bookToUpdate.RecentlyAdded = true;
-            }
-            else
-            {
-                bookToUpdate.RecentlyAdded = false;
-            }
-            _unitOfWork.Book.Update(bookToUpdate);
-            _unitOfWork.Save();
-            return Ok("Book updated succesfully");
+            return Ok(bookToUpdate);
         }
 
 
