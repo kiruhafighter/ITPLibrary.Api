@@ -13,7 +13,7 @@ namespace ITPLibrary.Api.Core.Profiles
     {
         public MappingProfiles()
         {
-            CreateMap<Book, BookDto>();
+            CreateMap<Book, BookDto>().ReverseMap();
         }
     }
 }

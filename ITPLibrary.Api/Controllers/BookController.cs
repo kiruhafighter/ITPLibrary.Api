@@ -11,24 +11,24 @@ namespace ITPLibrary.Api.Controllers
     [ApiController]
     public class BookController : ControllerBase
     {
-        private readonly IBookService _boorService;
+        private readonly IBookService _bookService;
         public BookController(IBookService boorService)
         {
-            _boorService = boorService;
+            _bookService = boorService;
         }
 
         [HttpGet]
         [Route("getpopularbooks")]
         public IEnumerable<BookDto> GetPopularBooks()
         {
-            return _boorService.GetPopularBooks();
+            return _bookService.GetPopularBooks();
         }
 
         [HttpGet]
         [Route("getallbooks")]
         public IEnumerable<BookDto> GetAllBooks()
         {
-            return _boorService.GetAllBooks();
+            return _bookService.GetAllBooks();
         }
 
         [HttpGet("name")]
@@ -38,11 +38,11 @@ namespace ITPLibrary.Api.Controllers
             {
                 return BadRequest();
             }
-            if(_boorService.GetByName(name) == null)
+            if(_bookService.GetByName(name) == null)
             {
                 return NotFound();
             }
-            return Ok(_boorService.GetByName(name));
+            return Ok(_bookService.GetByName(name));
         }
 
         [HttpGet("id")]
@@ -52,17 +52,17 @@ namespace ITPLibrary.Api.Controllers
             {
                 return BadRequest();
             }
-            if (_boorService.GetById(id) == null)
+            if (_bookService.GetById(id) == null)
             {
                 return NotFound();
             }
-            return Ok(_boorService.GetById(id));
+            return Ok(_bookService.GetById(id));
         }
 
         [HttpPost("book")]
         public IActionResult Post(Book book)
         {
-            var bookToPost = _boorService.Post(book);
+            var bookToPost = _bookService.Post(book);
             if (bookToPost == null)
             {
                 return BadRequest();
@@ -77,7 +77,7 @@ namespace ITPLibrary.Api.Controllers
             {
                 return BadRequest();
             }
-            var bookToDelete = _boorService.Delete(id);
+            var bookToDelete = _bookService.Delete(id);
             if (bookToDelete == null)
             {
                 return NotFound();
@@ -92,7 +92,7 @@ namespace ITPLibrary.Api.Controllers
             { 
                 return BadRequest();
             }
-            var bookToDelete = _boorService.Delete(name);
+            var bookToDelete = _bookService.Delete(name);
             if (bookToDelete == null)
             {
                 return NotFound();
@@ -101,32 +101,32 @@ namespace ITPLibrary.Api.Controllers
         }
 
         //Old Put Method version
-        //[HttpPut("{id}")]
-        //public IActionResult Update(int id, Book book)
-        //{
-        //    if (book.Id == id || !ModelState.IsValid)
-        //    { 
-        //        return BadRequest();
-        //    }
-        //    var bookFromDb = _boorService.GetById(id);
-        //    if(bookFromDb == null)
-        //    {
-        //        return NotFound();
-        //    }
-        //    return Ok(_boorService.Update(id, book));
-        //}
-
-
         [HttpPut("{id}")]
-        public IActionResult Update(int id, string title, double price, string author, double popularRate)
+        public IActionResult Update(int id, Book book)
         {
-            var bookToUpdate = _boorService.Update(id, title, price, author, popularRate);
+            if (!ModelState.IsValid)
+            {
+                return BadRequest();
+            }
+            var bookToUpdate = _bookService.Update(id, book);
             if(bookToUpdate == null)
             {
                 return NotFound();
             }
             return Ok(bookToUpdate);
         }
+
+
+        //[HttpPut("{id}")]
+        //public IActionResult Update(int id, string title, double price, string author, double popularRate)
+        //{
+        //    var bookToUpdate = _bookService.Update(id, title, price, author, popularRate);
+        //    if (bookToUpdate == null)
+        //    {
+        //        return NotFound();
+        //    }
+        //    return Ok(bookToUpdate);
+        //}
 
 
     }
