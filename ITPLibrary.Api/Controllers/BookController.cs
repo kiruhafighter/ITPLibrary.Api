@@ -102,7 +102,7 @@ namespace ITPLibrary.Api.Controllers
 
         //Old Put Method version
         [HttpPut("{id}")]
-        public IActionResult Update(int id, Book book)
+        public IActionResult Update(int id, BookDto book)
         {
             if (!ModelState.IsValid)
             {
