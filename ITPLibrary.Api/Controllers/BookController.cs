@@ -100,25 +100,45 @@ namespace ITPLibrary.Api.Controllers
             return Ok(bookToDelete);
         }
 
-        //Old Put Method version
+
         [HttpPut("{id}")]
-        public IActionResult Update(int id, BookDto book)
+        public IActionResult Update(int id, [FromBody] BookDto book)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest();
             }
             var bookToUpdate = _bookService.Update(id, book);
-            if(bookToUpdate == null)
+            if (bookToUpdate == null)
             {
                 return NotFound();
             }
             return Ok(bookToUpdate);
         }
 
+        //??
+        //[HttpPut]
+        //public IActionResult Update([FromQuery] int id, [FromBody] BookDto book)
+        //{
+        //    if (!ModelState.IsValid)
+        //    {
+        //        return BadRequest();
+        //    }
+        //    if (book.Id != id)
+        //    {
+        //        return BadRequest();
+        //    }
+        //    if (!_bookService.BookExists(book.Id))
+        //    {
+        //        return BadRequest();
+        //    }
+        //    var bookToUpdate = _bookService.Update(book);
+        //    return Ok(bookToUpdate);
+        //}
+        //??
 
         //[HttpPut("{id}")]
-        //public IActionResult Update(int id, string title, double price, string author, double popularRate)
+        //public IActionResult Update([From Query] int id, string title, double price, string author, double popularRate)
         //{
         //    var bookToUpdate = _bookService.Update(id, title, price, author, popularRate);
         //    if (bookToUpdate == null)

@@ -116,19 +116,6 @@ namespace ITPLibrary.Api.Core.Services
             return _mapper.Map<BookDto>(bookToUpdate);
         }
 
-        //???The instance of entity type 'Book' cannot be tracked because another
-        //instance with the same key value for {'Id'} is already being tracked???
-        //public BookDto Update(int id, Book book)
-        //{
-        //    if (BookExists(id))
-        //    {
-        //        _unitOfWork.Book.Update(book);
-        //        _unitOfWork.Save();
-        //        return _mapper.Map<BookDto>(book);
-        //    }
-        //    return null;
-        //}
-
 
         public BookDto Update(int id, BookDto book)
         {
@@ -146,6 +133,13 @@ namespace ITPLibrary.Api.Core.Services
             return null;
         }
 
+        //???The instance of entity type 'Book' cannot be tracked because another
+        //instance with the same key value for {'Id'} is already being tracked???
+        public BookDto Update(BookDto book)
+        {
+            _unitOfWork.Book.Update(_mapper.Map<Book>(book));
+            return book;
+        }
 
         //???The instance of entity type 'Book' cannot be tracked because another
         //instance with the same key value for {'Id'} is already being tracked???

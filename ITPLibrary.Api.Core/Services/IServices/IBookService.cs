@@ -14,6 +14,7 @@ namespace ITPLibrary.Api.Core.Services.IServices
         BookDto Delete(string name);
         BookDto Update(int id, string title, double price, string author, double popularRate);
         BookDto Update(int id, BookDto book);
+        BookDto Update (BookDto book);
         bool BookExists(int id);
 
     }

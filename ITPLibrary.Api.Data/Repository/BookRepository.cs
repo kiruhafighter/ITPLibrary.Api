@@ -21,7 +21,7 @@ namespace ITPLibrary.Api.Data.Repository
 
         public void Update(Book obj)
         {
-            //_db.Entry<Book>(obj).State = EntityState.Detached;
+            _db.Entry<Book>(obj).State = EntityState.Detached;
             _db.Books.Update(obj);
         }
     }
