@@ -56,6 +56,12 @@ namespace ITPLibrary.Api.Data.Repository
             return Save();
         }
 
+        public bool DeleteBook(Book book)
+        {
+            _context.Remove(book);
+            return Save();
+        }
+
         public bool Save()
         {
             var saved = _context.SaveChanges();

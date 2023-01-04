@@ -11,6 +11,6 @@ namespace ITPLibrary.Api.Core.Services.IServices
         BookDto GetBook(string title);
         BookDto CreateBook(BookDto book);
         BookDto UpdateBook(int bookId, BookDto book);
-
+        bool DeleteBook(int bookId);
     }
 }

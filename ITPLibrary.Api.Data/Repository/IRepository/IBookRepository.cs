@@ -16,6 +16,7 @@ namespace ITPLibrary.Api.Data.Repository.IRepository
         bool BookExists(int id);
         bool CreateBook(Book book);
         bool UpdateBook(Book book);
+        bool DeleteBook(Book book);
         bool Save();
     }
 }

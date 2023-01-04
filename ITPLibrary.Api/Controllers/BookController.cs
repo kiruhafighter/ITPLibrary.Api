@@ -106,6 +106,23 @@ namespace ITPLibrary.Api.Controllers
             }
             return Ok(book);
         }
-
+        
+        [HttpDelete("{bookId}")]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(404)]
+        public IActionResult DeleteBook(int bookId)
+        {
+            if (!ModelState.IsValid) 
+            {
+                return BadRequest(ModelState); 
+            }
+            if (!_bookService.DeleteBook(bookId))
+            {
+                ModelState.AddModelError("", "Something went wrong while deleting book");
+                return StatusCode(500, ModelState);
+            }
+            return Ok("Book deleted");
+        }
     }
 }

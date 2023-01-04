@@ -86,5 +86,19 @@ namespace ITPLibrary.Api.Core.Services
             }
             return book;
         }
+
+        public bool DeleteBook(int bookId)
+        {
+            if(bookId == null || bookId < 0)
+            {
+                return false;
+            }
+            if (!_bookRepository.BookExists(bookId))
+            {
+                return false;
+            }
+            var book = _bookRepository.GetBook(bookId);
+            return _bookRepository.DeleteBook(book);
+        }
     }
 }
