@@ -7,9 +7,15 @@ using System.Threading.Tasks;
 
 namespace ITPLibrary.Api.Data.Repository.IRepository
 {
-    public interface IBookRepository : IRepository<Book>
+    public interface IBookRepository 
     {
-        void Update(Book obj);
-        
+        ICollection<Book> GetBooks();
+        Book GetBook(int id);
+        Book GetBook(string title);
+        ICollection<Book> GetPopularBooks();
+        bool BookExists(int id);
+        bool CreateBook(Book book);
+        bool UpdateBook(Book book);
+        bool Save();
     }
 }

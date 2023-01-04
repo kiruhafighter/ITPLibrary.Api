@@ -14,155 +14,77 @@ namespace ITPLibrary.Api.Core.Services
 {
     public class BookService : IBookService
     {
-        private readonly IUnitOfWork _unitOfWork;
+        private readonly IBookRepository _bookRepository;
         private readonly IMapper _mapper;
-
-        public BookService(IUnitOfWork unitOfWork, IMapper mapper)
+        public BookService(IBookRepository bookRepository, IMapper mapper)
         {
-            _unitOfWork = unitOfWork;
+            _bookRepository = bookRepository;
             _mapper = mapper;
         }
 
-        public IEnumerable<BookDto> GetPopularBooks()
+        public ICollection<BookDto> GetBooks()
         {
-            var popularBooks = _mapper.Map<List<BookDto>>(_unitOfWork.Book.GetAllWithCondition(n => n.PopularityRate > 9).ToList());
-            return popularBooks;
+            return _mapper.Map<List<BookDto>>(_bookRepository.GetBooks());
         }
 
-        public IEnumerable<BookDto> GetAllBooks()
+        public ICollection<BookDto> GetPopularBooks()
         {
-            var allBooks = _mapper.Map<List<BookDto>>(_unitOfWork.Book.GetAll().ToList());
-            return allBooks;
+            return _mapper.Map<List<BookDto>>(_bookRepository.GetPopularBooks());
         }
 
-        public BookDto GetByName(string name)
+        public BookDto GetBook(int id)
         {
-            var bookByName = _mapper.Map<BookDto>(_unitOfWork.Book.GetFirstOrDefault(b => b.Title == name));
-            if (bookByName == null)
+            if (!_bookRepository.BookExists(id))
             {
                 return null;
             }
-            return bookByName;
+            return _mapper.Map<BookDto>(_bookRepository.GetBook(id));
         }
 
-        public BookDto GetById(int id)
+        public BookDto GetBook(string title)
         {
-            var bookById = _mapper.Map<BookDto>(_unitOfWork.Book.GetFirstOrDefault(b => b.Id == id));
-            if (bookById == null)
+            var book = _bookRepository.GetBook(title);
+            if(book == null)
             {
                 return null;
             }
-            return bookById;
-        }
-
-        public BookDto Post(Book book)
-        {
-            if (book == null || book.Id != 0)
-            {
-                return null;
-            }
-            _unitOfWork.Book.Add(book);
-            _unitOfWork.Save();
             return _mapper.Map<BookDto>(book);
         }
 
-        public BookDto Delete(int id)
+        public BookDto CreateBook (BookDto book)
         {
-            var bookFromDb = _unitOfWork.Book.GetFirstOrDefault(b => b.Id == id);
-            if(bookFromDb== null)
+            if(book == null)
             {
                 return null;
             }
-            _unitOfWork.Book.Remove(bookFromDb);
-            _unitOfWork.Save();
-            return _mapper.Map<BookDto>(bookFromDb);
-        }
-        
-
-        public BookDto Delete(string name)
-        {
-            var bookFromDb = _unitOfWork.Book.GetFirstOrDefault(b => b.Title == name);
-            if (bookFromDb == null)
+            var bookMap = _mapper.Map<Book>(book);
+            if (!_bookRepository.CreateBook(bookMap))
             {
                 return null;
             }
-            _unitOfWork.Book.Remove(bookFromDb);
-            _unitOfWork.Save();
-            return _mapper.Map<BookDto>(bookFromDb);
-        }
-
-        public BookDto Update(int id, string title, double price, string author, double popularRate)
-        {
-            var bookToUpdate = _unitOfWork.Book.GetFirstOrDefault(b => b.Id == id);
-            if (bookToUpdate == null)
-            {
-                return null;
-            }
-            bookToUpdate.Title = title;
-            bookToUpdate.Price = price;
-            bookToUpdate.Author = author;
-            bookToUpdate.Thumbnail = " ";
-            bookToUpdate.PopularityRate = popularRate;
-            if (bookToUpdate.AddingTime < DateTime.Now.AddDays(-14))
-            {
-                bookToUpdate.RecentlyAdded = true;
-            }
-            else
-            {
-                bookToUpdate.RecentlyAdded = false;
-            }
-            _unitOfWork.Book.Update(bookToUpdate);
-            _unitOfWork.Save();
-            return _mapper.Map<BookDto>(bookToUpdate);
-        }
-
-
-        public BookDto Update(int id, BookDto book)
-        {
-            if (BookExists(id))
-            {
-                var bookToUpdate = _unitOfWork.Book.GetFirstOrDefault(b => b.Id == id);
-                bookToUpdate.Title = book.Title;
-                bookToUpdate.Price = book.Price;
-                bookToUpdate.Author = book.Author;
-                bookToUpdate.PopularityRate = book.PopularityRate;
-                _unitOfWork.Book.Update(bookToUpdate);
-                _unitOfWork.Save();
-                return _mapper.Map<BookDto>(bookToUpdate);
-            }
-            return null;
-        }
-
-        //???The instance of entity type 'Book' cannot be tracked because another
-        //instance with the same key value for {'Id'} is already being tracked???
-        public BookDto Update(BookDto book)
-        {
-            _unitOfWork.Book.Update(_mapper.Map<Book>(book));
             return book;
         }
 
-        //???The instance of entity type 'Book' cannot be tracked because another
-        //instance with the same key value for {'Id'} is already being tracked???
-        //public BookDto Update(int id, BookDto book)
-        //{
-        //    if (BookExists(id))
-        //    {
-        //        book.Id = id;
-        //        _unitOfWork.Book.Update(_mapper.Map<Book>(book));
-        //        _unitOfWork.Save();
-        //        return book;
-        //    }
-        //    return null;
-        //}
-
-        public bool BookExists (int id)
+        public BookDto UpdateBook (int bookId, BookDto book)
         {
-            var book = _unitOfWork.Book.GetFirstOrDefault(b => b.Id == id);
             if(book == null)
             {
-                return false;
+                return null;
             }
-            return true;
+            if(!_bookRepository.BookExists(bookId))
+            {
+                return null;
+            }
+            if(bookId != book.Id)
+            {
+                return null;
+            }
+            var bookMap = _mapper.Map<Book>(book);
+            if (!_bookRepository.UpdateBook(bookMap))
+            {
+                return null;
+            }
+            return book;
         }
     }
 }

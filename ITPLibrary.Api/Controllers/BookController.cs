@@ -18,136 +18,94 @@ namespace ITPLibrary.Api.Controllers
         }
 
         [HttpGet]
-        [Route("getpopularbooks")]
-        public IEnumerable<BookDto> GetPopularBooks()
-        {
-            return _bookService.GetPopularBooks();
-        }
-
-        [HttpGet]
-        [Route("getallbooks")]
-        public IEnumerable<BookDto> GetAllBooks()
-        {
-            return _bookService.GetAllBooks();
-        }
-
-        [HttpGet("name")]
-        public IActionResult GetByName(string name)
-        {
-            if (name == null || name.Length == 0)
-            {
-                return BadRequest();
-            }
-            if(_bookService.GetByName(name) == null)
-            {
-                return NotFound();
-            }
-            return Ok(_bookService.GetByName(name));
-        }
-
-        [HttpGet("id")]
-        public IActionResult GetById(int id)
-        {
-            if (id == null || id == 0)
-            {
-                return BadRequest();
-            }
-            if (_bookService.GetById(id) == null)
-            {
-                return NotFound();
-            }
-            return Ok(_bookService.GetById(id));
-        }
-
-        [HttpPost("book")]
-        public IActionResult Post(Book book)
-        {
-            var bookToPost = _bookService.Post(book);
-            if (bookToPost == null)
-            {
-                return BadRequest();
-            }
-            return Ok(bookToPost);
-        }
-
-        [HttpDelete("id")]
-        public IActionResult Delete(int id)
-        {
-            if (id == null || id == 0)
-            {
-                return BadRequest();
-            }
-            var bookToDelete = _bookService.Delete(id);
-            if (bookToDelete == null)
-            {
-                return NotFound();
-            }
-            return Ok(bookToDelete);
-        }
-
-        [HttpDelete("name")]
-        public IActionResult Delete(string name)
-        {
-            if (name == null || name.Length == 0)
-            { 
-                return BadRequest();
-            }
-            var bookToDelete = _bookService.Delete(name);
-            if (bookToDelete == null)
-            {
-                return NotFound();
-            }
-            return Ok(bookToDelete);
-        }
-
-
-        [HttpPut("{id}")]
-        public IActionResult Update(int id, [FromBody] BookDto book)
+        [ProducesResponseType(200, Type = typeof(IEnumerable<BookDto>))]
+        public IActionResult GetBooks()
         {
             if (!ModelState.IsValid)
             {
-                return BadRequest();
+                return BadRequest(ModelState);
             }
-            var bookToUpdate = _bookService.Update(id, book);
-            if (bookToUpdate == null)
+            return Ok(_bookService.GetBooks());
+        }
+
+        [HttpGet]
+        [Route("Get Popular Books")]
+        [ProducesResponseType(200, Type = typeof(IEnumerable<BookDto>))]
+        public IActionResult GetPopularBooks()
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            return Ok(_bookService.GetPopularBooks());
+        }
+
+        [HttpGet("id")]
+        [ProducesResponseType(200, Type = typeof(BookDto))]
+        public IActionResult GetBook(int id)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            var book = _bookService.GetBook(id);
+            if(book == null)
             {
                 return NotFound();
             }
-            return Ok(bookToUpdate);
+            return Ok(book);
         }
 
-        //??
-        //[HttpPut]
-        //public IActionResult Update([FromQuery] int id, [FromBody] BookDto book)
-        //{
-        //    if (!ModelState.IsValid)
-        //    {
-        //        return BadRequest();
-        //    }
-        //    if (book.Id != id)
-        //    {
-        //        return BadRequest();
-        //    }
-        //    if (!_bookService.BookExists(book.Id))
-        //    {
-        //        return BadRequest();
-        //    }
-        //    var bookToUpdate = _bookService.Update(book);
-        //    return Ok(bookToUpdate);
-        //}
-        //??
+        [HttpGet("title")]
+        [ProducesResponseType(200, Type = typeof(BookDto))]
+        public IActionResult GetBookByName(string title)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            var book = _bookService.GetBook(title);
+            if (book == null)
+            {
+                return NotFound();
+            }
+            return Ok(book);
+        }
 
-        //[HttpPut("{id}")]
-        //public IActionResult Update([From Query] int id, string title, double price, string author, double popularRate)
-        //{
-        //    var bookToUpdate = _bookService.Update(id, title, price, author, popularRate);
-        //    if (bookToUpdate == null)
-        //    {
-        //        return NotFound();
-        //    }
-        //    return Ok(bookToUpdate);
-        //}
+        [HttpPost]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(400)]
+        public IActionResult CreateBook (BookDto book)
+        {
+            if(_bookService.CreateBook(book) == null)
+            {
+                ModelState.AddModelError("", "Something went wrong while creating new book");
+                return StatusCode(500, ModelState);
+            }
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            return Ok(book);
+        }
 
+        [HttpPut]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(404)]
+        public IActionResult UpdateBook(int bookId, BookDto book)
+        {
+            if (_bookService.UpdateBook(bookId, book) == null)
+            {
+                ModelState.AddModelError("", "Something went wrong while updating book");
+                return StatusCode(500, ModelState);
+            }
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            return Ok(book);
+        }
 
     }
 }
