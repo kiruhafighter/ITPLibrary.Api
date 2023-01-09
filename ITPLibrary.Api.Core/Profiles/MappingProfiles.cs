@@ -1,11 +1,6 @@
 ﻿using AutoMapper;
 using ITPLibrary.Api.Core.Dtos;
 using ITPLibrary.Api.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ITPLibrary.Api.Core.Profiles
 {
@@ -14,6 +9,7 @@ namespace ITPLibrary.Api.Core.Profiles
         public MappingProfiles()
         {
             CreateMap<Book, BookDto>().ReverseMap();
+            CreateMap<Book, AddBookDto>().ReverseMap();
         }
     }
 }

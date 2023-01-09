@@ -3,12 +3,6 @@ using ITPLibrary.Api.Core.Dtos;
 using ITPLibrary.Api.Core.Services.IServices;
 using ITPLibrary.Api.Data.Repository.IRepository;
 using ITPLibrary.Api.Models;
-using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ITPLibrary.Api.Core.Services
 {
@@ -22,83 +16,135 @@ namespace ITPLibrary.Api.Core.Services
             _mapper = mapper;
         }
 
-        public ICollection<BookDto> GetBooks()
+        public ServiceResponse<ICollection<BookDto>> GetBooks()
         {
-            return _mapper.Map<List<BookDto>>(_bookRepository.GetBooks());
+            var serviceResponse = new ServiceResponse<ICollection<BookDto>>();
+            serviceResponse.Data = _mapper.Map<List<BookDto>>(_bookRepository.GetBooks());
+            return serviceResponse;
         }
 
-        public ICollection<BookDto> GetPopularBooks()
+        public ServiceResponse<ICollection<BookDto>> GetPopularBooks()
         {
-            return _mapper.Map<List<BookDto>>(_bookRepository.GetPopularBooks());
+            var serviceResponse = new ServiceResponse<ICollection<BookDto>>();
+            serviceResponse.Data = _mapper.Map<List<BookDto>>(_bookRepository.GetPopularBooks());
+            return serviceResponse;
         }
 
-        public BookDto GetBook(int id)
+        public ServiceResponse<BookDto> GetBook(int id)
         {
+            var serviceResponse = new ServiceResponse<BookDto>();
             if (!_bookRepository.BookExists(id))
             {
-                return null;
+                serviceResponse.Success = false;
+                serviceResponse.Message = $"Book with id {id} is not found";
             }
-            return _mapper.Map<BookDto>(_bookRepository.GetBook(id));
+            else
+            {
+                serviceResponse.Data = _mapper.Map<BookDto>(_bookRepository.GetBook(id));
+            }
+            return serviceResponse;
         }
 
-        public BookDto GetBook(string title)
+        public ServiceResponse<BookDto> GetBook(string title)
         {
+            var serviceResponse = new ServiceResponse<BookDto>();
             var book = _bookRepository.GetBook(title);
             if(book == null)
             {
-                return null;
+                serviceResponse.Success = false;
+                serviceResponse.Message = $"Book with title '{title}' is not found";
             }
-            return _mapper.Map<BookDto>(book);
+            else
+            {
+                serviceResponse.Data = _mapper.Map<BookDto>(book);
+            }
+            return serviceResponse;
         }
 
-        public BookDto CreateBook (BookDto book)
+        public ServiceResponse<AddBookDto> CreateBook (AddBookDto book)
         {
+            var serviceResponse = new ServiceResponse<AddBookDto>();
             if(book == null)
             {
-                return null;
+                serviceResponse.Success = false;
+                serviceResponse.Message = "Book value is inappropriate";
             }
-            var bookMap = _mapper.Map<Book>(book);
-            if (!_bookRepository.CreateBook(bookMap))
+            else
             {
-                return null;
+                var bookMap = _mapper.Map<Book>(book);
+                if (!_bookRepository.CreateBook(bookMap))
+                {
+                    serviceResponse.Success = false;
+                    serviceResponse.Message = "Something went wrong while creating book";
+                }
+                else
+                {
+                    serviceResponse.Data = book;
+                    serviceResponse.Message = "Book created successfully";
+                }
             }
-            return book;
+            return serviceResponse;
         }
 
-        public BookDto UpdateBook (int bookId, BookDto book)
+        public ServiceResponse<BookDto> UpdateBook (int bookId, AddBookDto book)
         {
+            var serviceResponse = new ServiceResponse<BookDto>();
             if(book == null)
             {
-                return null;
+                serviceResponse.Success = false;
+                serviceResponse.Message = "Book value is inappropriate";
             }
-            if(!_bookRepository.BookExists(bookId))
+            else if(!_bookRepository.BookExists(bookId))
             {
-                return null;
+                serviceResponse.Success = false;
+                serviceResponse.Message = $"Book with id {bookId} is not found";
             }
-            if(bookId != book.Id)
+            else
             {
-                return null;
+                var bookMap = _mapper.Map<Book>(book);
+                bookMap.Id = bookId;
+                if (!_bookRepository.UpdateBook(bookMap))
+                {
+                    serviceResponse.Success = false;
+                    serviceResponse.Message = $"Something went wrong while updating book";
+                }
+                else
+                {
+                    serviceResponse.Data = _mapper.Map<BookDto>(bookMap);
+                    serviceResponse.Message = "Book updated successfully";
+                }
             }
-            var bookMap = _mapper.Map<Book>(book);
-            if (!_bookRepository.UpdateBook(bookMap))
-            {
-                return null;
-            }
-            return book;
+            return serviceResponse;
         }
 
-        public bool DeleteBook(int bookId)
+        public ServiceResponse<bool> DeleteBook(int bookId)
         {
+            var serviceResponse = new ServiceResponse<bool>();
             if(bookId == null || bookId < 0)
             {
-                return false;
+                serviceResponse.Success = false;
+                serviceResponse.Message = "Wrong id value";
             }
-            if (!_bookRepository.BookExists(bookId))
+            else if (!_bookRepository.BookExists(bookId))
             {
-                return false;
+                serviceResponse.Success = false;
+                serviceResponse.Message = $"Book with id {bookId} is not found";
             }
-            var book = _bookRepository.GetBook(bookId);
-            return _bookRepository.DeleteBook(book);
+            else
+            {
+                var book = _bookRepository.GetBook(bookId);
+                if (!_bookRepository.DeleteBook(book))
+                {
+                    serviceResponse.Success = false;
+                    serviceResponse.Message = $"Something went wrong while deleting";
+                }
+                else
+                {
+                    serviceResponse.Data = true;
+                    serviceResponse.Message = "Book has been deleted successfully";
+                }
+            }
+            return serviceResponse;
         }
     }
 }

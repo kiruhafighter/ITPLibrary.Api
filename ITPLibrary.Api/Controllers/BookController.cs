@@ -1,6 +1,4 @@
-﻿using ITPLibrary.Api.Data.Data;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using ITPLibrary.Api.Models;
 using ITPLibrary.Api.Core.Services.IServices;
 using ITPLibrary.Api.Core.Dtos;
@@ -12,13 +10,13 @@ namespace ITPLibrary.Api.Controllers
     public class BookController : ControllerBase
     {
         private readonly IBookService _bookService;
-        public BookController(IBookService boorService)
+        public BookController(IBookService bookService)
         {
-            _bookService = boorService;
+            _bookService = bookService;
         }
 
         [HttpGet]
-        [ProducesResponseType(200, Type = typeof(IEnumerable<BookDto>))]
+        [ProducesResponseType(200, Type = typeof(ServiceResponse<IEnumerable<BookDto>>))]
         public IActionResult GetBooks()
         {
             if (!ModelState.IsValid)
@@ -30,7 +28,7 @@ namespace ITPLibrary.Api.Controllers
 
         [HttpGet]
         [Route("Get Popular Books")]
-        [ProducesResponseType(200, Type = typeof(IEnumerable<BookDto>))]
+        [ProducesResponseType(200, Type = typeof(ServiceResponse<IEnumerable<BookDto>>))]
         public IActionResult GetPopularBooks()
         {
             if (!ModelState.IsValid)
@@ -41,7 +39,7 @@ namespace ITPLibrary.Api.Controllers
         }
 
         [HttpGet("id")]
-        [ProducesResponseType(200, Type = typeof(BookDto))]
+        [ProducesResponseType(200, Type = typeof(ServiceResponse<BookDto>))]
         public IActionResult GetBook(int id)
         {
             if (!ModelState.IsValid)
@@ -49,15 +47,15 @@ namespace ITPLibrary.Api.Controllers
                 return BadRequest(ModelState);
             }
             var book = _bookService.GetBook(id);
-            if(book == null)
+            if(book.Success != true)
             {
-                return NotFound();
+                return NotFound(book);
             }
             return Ok(book);
         }
 
         [HttpGet("title")]
-        [ProducesResponseType(200, Type = typeof(BookDto))]
+        [ProducesResponseType(200, Type = typeof(ServiceResponse<BookDto>))]
         public IActionResult GetBookByName(string title)
         {
             if (!ModelState.IsValid)
@@ -65,50 +63,50 @@ namespace ITPLibrary.Api.Controllers
                 return BadRequest(ModelState);
             }
             var book = _bookService.GetBook(title);
-            if (book == null)
+            if (book.Success != true)
             {
-                return NotFound();
+                return NotFound(book);
             }
             return Ok(book);
         }
 
         [HttpPost]
-        [ProducesResponseType(204)]
+        [ProducesResponseType(200, Type = typeof(ServiceResponse<AddBookDto>))]
         [ProducesResponseType(400)]
-        public IActionResult CreateBook (BookDto book)
+        public IActionResult CreateBook (AddBookDto book)
         {
-            if(_bookService.CreateBook(book) == null)
+            var response = _bookService.CreateBook(book);
+            if (response.Success != true)
             {
-                ModelState.AddModelError("", "Something went wrong while creating new book");
-                return StatusCode(500, ModelState);
+                return BadRequest(response);
             }
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
-            return Ok(book);
+            return Ok(response);
         }
 
         [HttpPut]
-        [ProducesResponseType(204)]
+        [ProducesResponseType(200, Type = typeof(ServiceResponse<BookDto>))]
         [ProducesResponseType(400)]
         [ProducesResponseType(404)]
-        public IActionResult UpdateBook(int bookId, BookDto book)
+        public IActionResult UpdateBook(int bookId, AddBookDto book)
         {
-            if (_bookService.UpdateBook(bookId, book) == null)
+            var updBook = _bookService.UpdateBook(bookId, book);
+            if (updBook.Success != true)
             {
-                ModelState.AddModelError("", "Something went wrong while updating book");
-                return StatusCode(500, ModelState);
+                return BadRequest(updBook);
             }
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
-            return Ok(book);
+            return Ok(updBook);
         }
         
         [HttpDelete("{bookId}")]
-        [ProducesResponseType(204)]
+        [ProducesResponseType(200, Type = typeof(ServiceResponse<bool>))]
         [ProducesResponseType(400)]
         [ProducesResponseType(404)]
         public IActionResult DeleteBook(int bookId)
@@ -117,12 +115,12 @@ namespace ITPLibrary.Api.Controllers
             {
                 return BadRequest(ModelState); 
             }
-            if (!_bookService.DeleteBook(bookId))
+            var response = _bookService.DeleteBook(bookId);
+            if (!response.Success)
             {
-                ModelState.AddModelError("", "Something went wrong while deleting book");
-                return StatusCode(500, ModelState);
+                return BadRequest(response);
             }
-            return Ok("Book deleted");
+            return Ok(response);
         }
     }
 }

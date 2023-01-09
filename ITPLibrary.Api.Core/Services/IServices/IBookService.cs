@@ -5,12 +5,12 @@ namespace ITPLibrary.Api.Core.Services.IServices
 {
     public interface IBookService
     {
-        ICollection<BookDto> GetBooks();
-        ICollection<BookDto> GetPopularBooks();
-        BookDto GetBook(int id);
-        BookDto GetBook(string title);
-        BookDto CreateBook(BookDto book);
-        BookDto UpdateBook(int bookId, BookDto book);
-        bool DeleteBook(int bookId);
+        ServiceResponse<ICollection<BookDto>> GetBooks();
+        ServiceResponse<ICollection<BookDto>> GetPopularBooks();
+        ServiceResponse<BookDto> GetBook(int id);
+        ServiceResponse<BookDto> GetBook(string title);
+        ServiceResponse<AddBookDto> CreateBook(AddBookDto book);
+        ServiceResponse<BookDto> UpdateBook(int bookId, AddBookDto book);
+        ServiceResponse<bool> DeleteBook(int bookId);
     }
 }

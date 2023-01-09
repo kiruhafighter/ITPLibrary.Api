@@ -1,9 +1,7 @@
 ﻿namespace ITPLibrary.Api.Core.Dtos
 {
-    public class BookDto
+    public class AddBookDto
     {
-        public int Id { get; set; }
-
         public string Title { get; set; }
 
         public double Price { get; set; }
