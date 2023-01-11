@@ -4,14 +4,14 @@ namespace ITPLibrary.Api.Data.Repository.IRepository
 {
     public interface IBookRepository 
     {
-        ICollection<Book> GetBooks();
-        Book GetBook(int id);
-        Book GetBook(string title);
-        ICollection<Book> GetPopularBooks();
-        bool BookExists(int id);
-        bool CreateBook(Book book);
-        bool UpdateBook(Book book);
-        bool DeleteBook(Book book);
-        bool Save();
+        Task<ICollection<Book>> GetBooks();
+        Task<Book> GetBook(int id);
+        Task<Book> GetBook(string title);
+        Task<ICollection<Book>> GetPopularBooks();
+        Task<bool> BookExists(int id);
+        Task<bool> CreateBook(Book book);
+        Task<bool> UpdateBook(Book book);
+        Task<bool> DeleteBook(Book book);
+        Task<bool> Save();
     }
 }

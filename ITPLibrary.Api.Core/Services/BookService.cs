@@ -16,39 +16,39 @@ namespace ITPLibrary.Api.Core.Services
             _mapper = mapper;
         }
 
-        public ServiceResponse<ICollection<BookDto>> GetBooks()
+        public async Task<ServiceResponse<ICollection<BookDto>>> GetBooks()
         {
             var serviceResponse = new ServiceResponse<ICollection<BookDto>>();
-            serviceResponse.Data = _mapper.Map<List<BookDto>>(_bookRepository.GetBooks());
+            serviceResponse.Data = _mapper.Map<List<BookDto>>(await _bookRepository.GetBooks());
             return serviceResponse;
         }
 
-        public ServiceResponse<ICollection<BookDto>> GetPopularBooks()
+        public async Task<ServiceResponse<ICollection<BookDto>>> GetPopularBooks()
         {
             var serviceResponse = new ServiceResponse<ICollection<BookDto>>();
-            serviceResponse.Data = _mapper.Map<List<BookDto>>(_bookRepository.GetPopularBooks());
+            serviceResponse.Data = _mapper.Map<List<BookDto>>(await _bookRepository.GetPopularBooks());
             return serviceResponse;
         }
 
-        public ServiceResponse<BookDto> GetBook(int id)
+        public async Task<ServiceResponse<BookDto>> GetBook(int id)
         {
             var serviceResponse = new ServiceResponse<BookDto>();
-            if (!_bookRepository.BookExists(id))
+            if (! await _bookRepository.BookExists(id))
             {
                 serviceResponse.Success = false;
                 serviceResponse.Message = $"Book with id {id} is not found";
             }
             else
             {
-                serviceResponse.Data = _mapper.Map<BookDto>(_bookRepository.GetBook(id));
+                serviceResponse.Data = _mapper.Map<BookDto>(await _bookRepository.GetBook(id));
             }
             return serviceResponse;
         }
 
-        public ServiceResponse<BookDto> GetBook(string title)
+        public async Task<ServiceResponse<BookDto>> GetBook(string title)
         {
             var serviceResponse = new ServiceResponse<BookDto>();
-            var book = _bookRepository.GetBook(title);
+            var book = await _bookRepository.GetBook(title);
             if(book == null)
             {
                 serviceResponse.Success = false;
@@ -61,7 +61,7 @@ namespace ITPLibrary.Api.Core.Services
             return serviceResponse;
         }
 
-        public ServiceResponse<AddBookDto> CreateBook (AddBookDto book)
+        public async Task<ServiceResponse<AddBookDto>> CreateBook (AddBookDto book)
         {
             var serviceResponse = new ServiceResponse<AddBookDto>();
             if(book == null)
@@ -72,7 +72,7 @@ namespace ITPLibrary.Api.Core.Services
             else
             {
                 var bookMap = _mapper.Map<Book>(book);
-                if (!_bookRepository.CreateBook(bookMap))
+                if (!await _bookRepository.CreateBook(bookMap))
                 {
                     serviceResponse.Success = false;
                     serviceResponse.Message = "Something went wrong while creating book";
@@ -86,7 +86,7 @@ namespace ITPLibrary.Api.Core.Services
             return serviceResponse;
         }
 
-        public ServiceResponse<BookDto> UpdateBook (int bookId, AddBookDto book)
+        public async Task<ServiceResponse<BookDto>> UpdateBook (int bookId, AddBookDto book)
         {
             var serviceResponse = new ServiceResponse<BookDto>();
             if(book == null)
@@ -94,7 +94,7 @@ namespace ITPLibrary.Api.Core.Services
                 serviceResponse.Success = false;
                 serviceResponse.Message = "Book value is inappropriate";
             }
-            else if(!_bookRepository.BookExists(bookId))
+            else if(!await _bookRepository.BookExists(bookId))
             {
                 serviceResponse.Success = false;
                 serviceResponse.Message = $"Book with id {bookId} is not found";
@@ -103,7 +103,7 @@ namespace ITPLibrary.Api.Core.Services
             {
                 var bookMap = _mapper.Map<Book>(book);
                 bookMap.Id = bookId;
-                if (!_bookRepository.UpdateBook(bookMap))
+                if (!await _bookRepository.UpdateBook(bookMap))
                 {
                     serviceResponse.Success = false;
                     serviceResponse.Message = $"Something went wrong while updating book";
@@ -117,7 +117,7 @@ namespace ITPLibrary.Api.Core.Services
             return serviceResponse;
         }
 
-        public ServiceResponse<bool> DeleteBook(int bookId)
+        public async Task<ServiceResponse<bool>> DeleteBook(int bookId)
         {
             var serviceResponse = new ServiceResponse<bool>();
             if(bookId == null || bookId < 0)
@@ -125,15 +125,15 @@ namespace ITPLibrary.Api.Core.Services
                 serviceResponse.Success = false;
                 serviceResponse.Message = "Wrong id value";
             }
-            else if (!_bookRepository.BookExists(bookId))
+            else if (!await _bookRepository.BookExists(bookId))
             {
                 serviceResponse.Success = false;
                 serviceResponse.Message = $"Book with id {bookId} is not found";
             }
             else
             {
-                var book = _bookRepository.GetBook(bookId);
-                if (!_bookRepository.DeleteBook(book))
+                var book = await _bookRepository.GetBook(bookId);
+                if (!await _bookRepository.DeleteBook(book))
                 {
                     serviceResponse.Success = false;
                     serviceResponse.Message = $"Something went wrong while deleting";

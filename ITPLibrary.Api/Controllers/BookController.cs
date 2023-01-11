@@ -17,36 +17,36 @@ namespace ITPLibrary.Api.Controllers
 
         [HttpGet]
         [ProducesResponseType(200, Type = typeof(ServiceResponse<IEnumerable<BookDto>>))]
-        public IActionResult GetBooks()
+        public async Task<IActionResult> GetBooks()
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
-            return Ok(_bookService.GetBooks());
+            return Ok(await _bookService.GetBooks());
         }
 
         [HttpGet]
         [Route("Get Popular Books")]
         [ProducesResponseType(200, Type = typeof(ServiceResponse<IEnumerable<BookDto>>))]
-        public IActionResult GetPopularBooks()
+        public async Task<IActionResult> GetPopularBooks()
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
-            return Ok(_bookService.GetPopularBooks());
+            return Ok(await _bookService.GetPopularBooks());
         }
 
         [HttpGet("id")]
         [ProducesResponseType(200, Type = typeof(ServiceResponse<BookDto>))]
-        public IActionResult GetBook(int id)
+        public async Task<IActionResult> GetBook(int id)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
-            var book = _bookService.GetBook(id);
+            var book = await _bookService.GetBook(id);
             if(book.Success != true)
             {
                 return NotFound(book);
@@ -56,13 +56,13 @@ namespace ITPLibrary.Api.Controllers
 
         [HttpGet("title")]
         [ProducesResponseType(200, Type = typeof(ServiceResponse<BookDto>))]
-        public IActionResult GetBookByName(string title)
+        public async Task<IActionResult> GetBookByName(string title)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
-            var book = _bookService.GetBook(title);
+            var book = await _bookService.GetBook(title);
             if (book.Success != true)
             {
                 return NotFound(book);
@@ -73,9 +73,9 @@ namespace ITPLibrary.Api.Controllers
         [HttpPost]
         [ProducesResponseType(200, Type = typeof(ServiceResponse<AddBookDto>))]
         [ProducesResponseType(400)]
-        public IActionResult CreateBook (AddBookDto book)
+        public async Task<IActionResult> CreateBook (AddBookDto book)
         {
-            var response = _bookService.CreateBook(book);
+            var response = await _bookService.CreateBook(book);
             if (response.Success != true)
             {
                 return BadRequest(response);
@@ -91,9 +91,9 @@ namespace ITPLibrary.Api.Controllers
         [ProducesResponseType(200, Type = typeof(ServiceResponse<BookDto>))]
         [ProducesResponseType(400)]
         [ProducesResponseType(404)]
-        public IActionResult UpdateBook(int bookId, AddBookDto book)
+        public async Task<IActionResult> UpdateBook(int bookId, AddBookDto book)
         {
-            var updBook = _bookService.UpdateBook(bookId, book);
+            var updBook = await _bookService.UpdateBook(bookId, book);
             if (updBook.Success != true)
             {
                 return BadRequest(updBook);
@@ -109,13 +109,13 @@ namespace ITPLibrary.Api.Controllers
         [ProducesResponseType(200, Type = typeof(ServiceResponse<bool>))]
         [ProducesResponseType(400)]
         [ProducesResponseType(404)]
-        public IActionResult DeleteBook(int bookId)
+        public async Task<IActionResult> DeleteBook(int bookId)
         {
             if (!ModelState.IsValid) 
             {
                 return BadRequest(ModelState); 
             }
-            var response = _bookService.DeleteBook(bookId);
+            var response = await _bookService.DeleteBook(bookId);
             if (!response.Success)
             {
                 return BadRequest(response);
